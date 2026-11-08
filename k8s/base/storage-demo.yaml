@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: storage-demo
+  labels:
+    app: storage-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: storage-demo
+  template:
+    metadata:
+      labels:
+        app: storage-demo
+    spec:
+      containers:
+        - name: busybox
+          image: busybox:1.36
+          command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              echo "Starting storage demo container..."
+              if [ -f /data/demo.txt ]; then
+                echo "Existing data found:"
+                cat /data/demo.txt
+              else
+                echo "No existing data found. Initializing..."
+                echo "Initialized at $(date)" > /data/demo.txt
+              fi
+              while true; do
+                echo "Heartbeat at $(date)" >> /data/demo.txt
+                sleep 5
+              done
+          volumeMounts:
+            - name: storage-volume
+              mountPath: /data
+      volumes:
+        - name: storage-volume
+          persistentVolumeClaim:
+            claimName: storage-demo-pvc
+

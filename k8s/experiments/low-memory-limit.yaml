@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: selfhealing-demo
+  labels:
+    app: selfhealing-demo
+    experiment: low-memory-limit
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: selfhealing-demo
+  template:
+    metadata:
+      labels:
+        app: selfhealing-demo
+    spec:
+      containers:
+        - name: app
+          image: selfhealing-demo:v1
+          ports:
+            - name: http
+              containerPort: 8000
+          # CỐ Ý SAI: memory limit chỉ 10Mi (Python uvicorn cần ít nhất 30-50Mi để khởi động)
+          # Hậu quả: Pod bị Linux OOM killer terminate ngay -> exit code 137 (OOMKilled)
+          resources:
+            requests:
+              cpu: 100m
+              memory: 8Mi
+            limits:
+              cpu: 200m
+              memory: 10Mi
+

@@ -1,0 +1,12 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: selfhealing-demo-pdb
+  labels:
+    app: selfhealing-demo
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: selfhealing-demo
+

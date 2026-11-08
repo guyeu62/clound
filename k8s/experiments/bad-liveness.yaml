@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: selfhealing-demo
+  labels:
+    app: selfhealing-demo
+    experiment: bad-liveness
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: selfhealing-demo
+  template:
+    metadata:
+      labels:
+        app: selfhealing-demo
+    spec:
+      containers:
+        - name: app
+          image: selfhealing-demo:v1
+          ports:
+            - name: http
+              containerPort: 8000
+          # CỐ Ý SAI: liveness probe quá gắt (timeout 1s, period 1s, failureThreshold 1, initialDelay 0)
+          # Hậu quả: Pod bị kubelet kill liên tục -> CrashLoopBackOff / Restarts tăng vọt
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 1
+            timeoutSeconds: 1
+            failureThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 3
+

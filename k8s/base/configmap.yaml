@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: selfhealing-demo-config
+  labels:
+    app: selfhealing-demo
+data:
+  PORT: "8000"
+  APP_NAME: "selfhealing-demo"
+  ENVIRONMENT: "production"
+
